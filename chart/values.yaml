@@ -1,0 +1,23 @@
+# Number of pod replicas
+replicaCount: 2
+
+# Docker image details
+image:
+  repository: fusionaiacr2026v1.azurecr.io/fusion-ai
+  pullPolicy: IfNotPresent
+  tag: "v1"
+
+# Service configuration (how the app is exposed)
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 80
+
+# Resource limits for each pod
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "100m"
+  limits:
+    memory: "128Mi"
+    cpu: "250m"
