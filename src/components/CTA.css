@@ -1,0 +1,120 @@
+.cta-section {
+  padding: 80px 0 120px;
+}
+
+.cta-card {
+  border-radius: 32px;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 80px 60px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(124,58,237,0.06);
+  text-align: center;
+}
+
+.cta-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
+  top: -150px; left: -100px;
+}
+
+.orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(225,0,255,0.15) 0%, transparent 70%);
+  bottom: -100px; right: -80px;
+}
+
+.orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cta-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cta-grid-v {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.cta-grid-h {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.cta-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.cta-label { margin-bottom: 8px; }
+
+.cta-h2 {
+  font-size: clamp(32px, 4.5vw, 60px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+  line-height: 1.1;
+}
+
+.cta-sub {
+  font-size: 17px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.6);
+  max-width: 460px;
+}
+
+.cta-btns {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.cta-btn-main {
+  padding: 16px 36px;
+  font-size: 16px;
+  box-shadow: 0 0 50px rgba(124,58,237,0.4);
+}
+
+.cta-trust {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cta-trust-item {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .cta-card { padding: 48px 24px; }
+  .cta-h2 { font-size: 32px; }
+  .cta-trust { gap: 12px; flex-direction: column; align-items: center; }
+}
