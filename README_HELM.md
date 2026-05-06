@@ -126,3 +126,27 @@ docker tag fusion-ai:latest fusionaiacr2026v1.azurecr.io/fusion-ai:v1
 docker push fusionaiacr2026v1.azurecr.io/fusion-ai:v1
 az aks get-credentials -n fusion-ai-aks -g fusion-ai-rg --overwrite-existing
 helm install fusion-ai ./chart
+
+
+
+# Create Service Principal
+az ad sp create-for-rbac `
+  --name "github-actions-fusion-ai" `
+  --role "Contributor" `
+  --scopes "/subscriptions/c8bd8aa5-3aba-4806-add2-357985a59ccc/resourceGroups/fusion-ai-rg" `
+  --json-auth
+
+# Get the SP's "Object ID" (different from clientId)
+az ad sp list --display-name "github-actions-fusion-ai" --query "[].id" -o tsv
+
+#  Give the SP Permission to Push to ACR
+az role assignment create --assignee <OBJECT ID> --role "AcrPush" --scope "/subscriptions/c8bd8aa5-3aba-4806-add2-357985a59ccc/resourceGroups/fusion-ai-rg/providers/Microsoft.ContainerRegistry/registries/fusionaiacr2026v1"
+
+# Verify everything
+az role assignment list --assignee <OBJECT ID> --output table
+
+
+# Step 8: Create the GitHub Actions Workflow
+>> cd D:/fusion-ai
+>> mkdir -p .github/workflows
+

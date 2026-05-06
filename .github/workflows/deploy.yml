@@ -1,0 +1,93 @@
+name: Build and Deploy to AKS
+
+# Trigger: run this workflow on push to main branch
+on:
+  push:
+    branches:
+      - main
+  # Also allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+# Environment variables shared across jobs
+env:
+  IMAGE_NAME: fusion-ai
+  HELM_RELEASE_NAME: fusion-ai
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ============================================
+      # 1. Checkout code from GitHub
+      # ============================================
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ============================================
+      # 2. Login to Azure using Service Principal
+      # ============================================
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ============================================
+      # 3. Login to Azure Container Registry
+      # ============================================
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      # ============================================
+      # 4. Build Docker image
+      # ============================================
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest \
+            .
+
+      # ============================================
+      # 5. Push image to ACR
+      # ============================================
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+
+      # ============================================
+      # 6. Get AKS credentials so kubectl/helm can talk to cluster
+      # ============================================
+      - name: Get AKS credentials
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+      # ============================================
+      # 7. Install Helm
+      # ============================================
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+
+      # ============================================
+      # 8. Deploy to AKS using Helm
+      # ============================================
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ env.HELM_RELEASE_NAME }} ./chart \
+            --set image.repository=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }} \
+            --set image.tag=${{ github.sha }} \
+            --wait \
+            --timeout 5m
+
+      # ============================================
+      # 9. Show deployment info
+      # ============================================
+      - name: Show deployed resources
+        run: |
+          kubectl get pods
+          kubectl get service ${{ env.HELM_RELEASE_NAME }}-service
