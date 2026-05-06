@@ -107,3 +107,22 @@ terraform destroy
 # 7. Verify cleanup in Azure
 az group show --name fusion-ai-rg
 # Expected: ResourceGroupNotFound error = success
+
+
+# Complete up Commands
+
+terraform plan
+terraform apply
+# Step 3: Connect kubectl to AKS
+az aks get-credentials --resource-group fusion-ai-rg --name fusion-ai-aks --overwrite-existing
+# Verify
+kubectl get nodes
+helm version
+
+docker ps
+docker build -t fusion-ai:latest .
+az acr login --name fusionaiacr2026v1
+docker tag fusion-ai:latest fusionaiacr2026v1.azurecr.io/fusion-ai:v1
+docker push fusionaiacr2026v1.azurecr.io/fusion-ai:v1
+az aks get-credentials -n fusion-ai-aks -g fusion-ai-rg --overwrite-existing
+helm install fusion-ai ./chart
